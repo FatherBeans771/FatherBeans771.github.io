@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Toilet Tapper</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Rubik:wght@400;500;700&display=swap">
+<style>
+:root{--bg:#cfe6ee;--tile:#e9f4f7;--grout:#b5d2dc;--ink:#12303b;--muted:#4b6b76;--card:#f7fcfd;--line:#a9c9d4;--accent:#0b8fa8;--brass:#b8892b;--gold:#e8b930;--water:#4fc3dc;--ok:#1f7a4d;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f2229;--tile:#16303a;--grout:#0c1b21;--ink:#e3f3f7;--muted:#8fb0ba;--card:#1a3640;--line:#2c5260;--accent:#46c5dd;--brass:#e0b04e;--water:#3aa9c4;--ok:#6fd49c}}
+:root[data-theme="dark"]{--bg:#0f2229;--tile:#16303a;--grout:#0c1b21;--ink:#e3f3f7;--muted:#8fb0ba;--card:#1a3640;--line:#2c5260;--accent:#46c5dd;--brass:#e0b04e;--water:#3aa9c4;--ok:#6fd49c}
+*{box-sizing:border-box}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100%;background-color:var(--bg);color:var(--ink);font-family:Rubik,system-ui,-apple-system,"Segoe UI",sans-serif;
+background-image:linear-gradient(var(--grout) 2px,transparent 2px),linear-gradient(90deg,var(--grout) 2px,transparent 2px);background-size:56px 56px;background-position:-1px -1px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
+.wrap{max-width:960px;margin:0 auto;padding:18px 14px 40px;display:grid;gap:16px;grid-template-columns:1fr}
+@media(min-width:820px){.wrap{grid-template-columns:1.1fr 1fr;align-items:start}}
+h1{font-family:"Bowlby One",Impact,"Arial Black",sans-serif;font-weight:400;font-size:clamp(34px,7vw,54px);margin:0;line-height:1;letter-spacing:.5px;color:var(--ink)}
+.top{grid-column:1/-1;display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.rank{background:var(--brass);color:#1d1403;font-weight:700;padding:6px 12px;border-radius:999px;font-size:14px}
+.stage{background:var(--tile);border:3px solid var(--line);border-radius:22px;padding:18px;text-align:center}
+.count{font-family:"Bowlby One",Impact,sans-serif;font-size:clamp(40px,9vw,64px);line-height:1}
+.sub{color:var(--muted);margin:6px 0 0;font-size:15px}
+.tapzone{position:relative;margin:10px auto 0;width:min(78vw,300px);user-select:none;-webkit-user-select:none}
+#tap{display:block;width:100%;background:none;border:0;padding:0;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;border-radius:24px}
+#tap:focus-visible{outline:4px solid var(--accent);outline-offset:4px}
+#tap svg{width:100%;height:auto;display:block;transition:transform .08s}
+#tap:active svg{transform:scale(.965)}
+.handle{transform-origin:244px 62px;transition:transform .1s}
+#tap:active .handle,.pressed .handle{transform:rotate(28deg)}
+.swirl{transform-origin:150px 214px}
+.flush .swirl{animation:sw .5s ease-out}
+@keyframes sw{0%{transform:rotate(0) scale(1)}60%{transform:rotate(200deg) scale(.7)}100%{transform:rotate(360deg) scale(1)}}
+.float{position:absolute;pointer-events:none;font-family:"Bowlby One",Impact,sans-serif;font-size:22px;color:var(--accent);text-shadow:0 2px 0 var(--card);animation:fl .9s ease-out forwards;z-index:3}
+@keyframes fl{to{transform:translateY(-90px);opacity:0}}
+.stats{display:flex;justify-content:center;gap:10px;margin-top:12px;flex-wrap:wrap}
+.stat{background:var(--card);border:2px solid var(--line);border-radius:12px;padding:8px 14px;font-size:14px;color:var(--muted)}
+.stat b{display:block;color:var(--ink);font-size:18px}
+.shop{background:var(--card);border:3px solid var(--line);border-radius:22px;padding:14px}
+.shop h2{font-family:"Bowlby One",Impact,sans-serif;font-weight:400;font-size:24px;margin:0 0 10px}
+.up{display:grid;grid-template-columns:1fr auto;gap:2px 10px;width:100%;text-align:left;background:var(--tile);color:var(--ink);border:2px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px;cursor:pointer;font:inherit}
+.up:hover:not(:disabled){border-color:var(--accent)}
+.up:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.up:disabled{opacity:.55;cursor:not-allowed}
+.up .n{font-weight:700;font-size:16px}
+.up .own{font-family:"Bowlby One",Impact,sans-serif;font-size:20px;color:var(--accent);grid-row:span 2;align-self:center}
+.up .d{font-size:13px;color:var(--muted)}
+.up .c{font-size:14px;font-weight:500;color:var(--ok)}
+.up:disabled .c{color:var(--muted)}
+.foot{grid-column:1/-1;display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:13px;flex-wrap:wrap}
+.foot button{font:inherit;background:none;border:2px solid var(--line);color:var(--muted);border-radius:8px;padding:4px 10px;cursor:pointer}
+.foot button:focus-visible{outline:3px solid var(--accent)}
+.gold #tap svg{filter:drop-shadow(0 0 14px rgba(232,185,48,.65))}
+.gold #tap svg [fill="#fbfeff"]{fill:#f2c94c}
+.gold #tap svg [fill="#e6f2f6"]{fill:#ffe083}
+.gold #tap svg [fill="#cfe3ea"]{fill:#d9a62e}
+.gold #tap svg [stroke="#8fb7c4"]{stroke:#8a5f0f}
+.gold .float{color:var(--brass)}
+@media(prefers-reduced-motion:reduce){.flush .swirl,.float{animation:none}.float{opacity:0}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="top">
+    <h1>Toilet Tapper</h1>
+    <span class="rank" id="rank">Porcelain Rookie</span>
+  </header>
+
+  <section class="stage" aria-label="Game">
+    <div class="count" id="count">0</div>
+    <p class="sub">flushes</p>
+    <div class="tapzone" id="zone">
+      <button id="tap" aria-label="Flush the toilet">
+        <svg viewBox="0 0 300 300" aria-hidden="true">
+          <ellipse cx="150" cy="284" rx="96" ry="9" fill="#000" opacity=".12"/>
+          <rect x="70" y="26" width="160" height="78" rx="14" fill="#fbfeff" stroke="#8fb7c4" stroke-width="5"/>
+          <rect x="62" y="18" width="176" height="16" rx="8" fill="#e6f2f6" stroke="#8fb7c4" stroke-width="5"/>
+          <g class="handle"><rect x="226" y="54" width="34" height="11" rx="5.5" fill="#b8892b"/><circle cx="244" cy="62" r="7" fill="#e8b930"/></g>
+          <path d="M52 112h196c0 52-18 84-52 98l8 50h-108l8-50c-34-14-52-46-52-98z" fill="#fbfeff" stroke="#8fb7c4" stroke-width="5" stroke-linejoin="round"/>
+          <ellipse cx="150" cy="128" rx="88" ry="20" fill="#e6f2f6" stroke="#8fb7c4" stroke-width="5"/>
+          <ellipse cx="150" cy="130" rx="68" ry="13" fill="#4fc3dc"/>
+          <g class="swirl"><path d="M150 214c-14 0-22-8-22-16s8-14 18-12c8 2 10 10 4 12" fill="none" stroke="#4fc3dc" stroke-width="5" stroke-linecap="round"/></g>
+          <rect x="102" y="262" width="96" height="14" rx="5" fill="#cfe3ea" stroke="#8fb7c4" stroke-width="4"/>
+        </svg>
+      </button>
+    </div>
+    <div class="stats">
+      <div class="stat"><b id="perTap">1</b>per tap</div>
+      <div class="stat"><b id="perSec">0</b>per second</div>
+      <div class="stat"><b id="total">0</b>all time</div>
+    </div>
+  </section>
+
+  <section class="shop" aria-label="Upgrades">
+    <h2>Plumbing supplies</h2>
+    <div id="shop"></div>
+  </section>
+
+  <footer class="foot">
+    <span>Progress saves in this browser.</span>
+    <button id="reset">Reset game</button>
+  </footer>
+</main>
+
+<script>
+(function(){
+  var KEY="toilet-tapper-v1";
+  var ITEMS=[
+    {id:"plunger",name:"Plunger",desc:"+1 flush every tap",base:25,g:1.55,tap:1},
+    {id:"flusher",name:"Wall-Mounted Flusher",desc:"0.5 flushes per second",base:50,g:1.15,cps:.5},
+    {id:"bidet",name:"Bidet Bro",desc:"4 flushes per second",base:400,g:1.15,cps:4},
+    {id:"intern",name:"Septic Intern",desc:"20 flushes per second",base:3000,g:1.15,cps:20},
+    {id:"crew",name:"Plumbing Crew",desc:"120 flushes per second",base:20000,g:1.15,cps:120},
+    {id:"pipe",name:"Sewer Pipeline",desc:"800 flushes per second",base:150000,g:1.15,cps:800},
+    {id:"throne",name:"Golden Throne",desc:"6,000 flushes per second",base:1200000,g:1.15,cps:6000}
+  ];
+  var RANKS=[[0,"Porcelain Rookie"],[100,"Bowl Cleaner"],[1000,"Certified Plunger"],[10000,"Master Plumber"],[100000,"Sewer Sovereign"],[1000000,"Lord of the Loo"],[10000000,"Emperor of the Throne"]];
+  var S={flushes:0,total:0,owned:{}};
+  try{var raw=localStorage.getItem(KEY);if(raw){var p=JSON.parse(raw);if(p&&typeof p.flushes==="number"){S=p;S.owned=S.owned||{};}}}catch(e){}
+
+  var $=function(id){return document.getElementById(id)};
+  function fmt(n){
+    if(n<1000)return (n%1?n.toFixed(1):String(Math.floor(n)));
+    var u=["K","M","B","T","Qa"],i=-1;
+    while(n>=1000&&i<u.length-1){n/=1000;i++}
+    return (n<10?n.toFixed(2):n<100?n.toFixed(1):Math.floor(n))+u[i];
+  }
+  function owned(it){return S.owned[it.id]||0}
+  function cost(it){return Math.ceil(it.base*Math.pow(it.g,owned(it)))}
+  function perTap(){return 1+owned(ITEMS[0])}
+  function perSec(){var s=0;ITEMS.forEach(function(it){if(it.cps)s+=it.cps*owned(it)});return s}
+
+  var shop=$("shop"),btns={};
+  ITEMS.forEach(function(it){
+    var b=document.createElement("button");b.className="up";
+    b.innerHTML='<span class="n"></span><span class="own"></span><span class="d"></span>';
+    var c=document.createElement("span");c.className="c";b.insertBefore(c,b.children[2]);
+    b.addEventListener("click",function(){
+      var k=cost(it);
+      if(S.flushes>=k){S.flushes-=k;S.owned[it.id]=owned(it)+1;render();save()}
+    });
+    shop.appendChild(b);btns[it.id]=b;
+  });
+
+  function render(){
+    $("count").textContent=fmt(Math.floor(S.flushes));
+    $("perTap").textContent=fmt(perTap());
+    $("perSec").textContent=fmt(perSec());
+    $("total").textContent=fmt(Math.floor(S.total));
+    var r=RANKS[0][1];RANKS.forEach(function(x){if(S.total>=x[0])r=x[1]});
+    $("rank").textContent=r;
+    zone.classList.toggle("gold",owned(ITEMS[6])>0);
+    ITEMS.forEach(function(it){
+      var b=btns[it.id],k=cost(it);
+      b.querySelector(".n").textContent=it.name;
+      b.querySelector(".own").textContent=owned(it);
+      b.querySelector(".d").textContent=it.desc;
+      b.querySelector(".c").textContent=fmt(k)+" flushes";
+      b.disabled=S.flushes<k;
+    });
+  }
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+
+  var zone=$("zone"),tap=$("tap");
+  function pop(x,y,txt){
+    var f=document.createElement("span");f.className="float";f.textContent="+"+txt;
+    f.style.left=x+"px";f.style.top=y+"px";zone.appendChild(f);
+    f.addEventListener("animationend",function(){f.remove()});
+    setTimeout(function(){f.remove()},1000);
+  }
+  var swTimer;
+  tap.addEventListener("click",function(e){
+    var n=perTap();S.flushes+=n;S.total+=n;
+    var r=zone.getBoundingClientRect();
+    var x=e.clientX?e.clientX-r.left:r.width/2,y=e.clientY?e.clientY-r.top:r.height/2;
+    pop(Math.max(10,Math.min(r.width-40,x-12)),Math.max(10,y-20),fmt(n));
+    zone.classList.remove("flush");void zone.offsetWidth;zone.classList.add("flush");
+    zone.classList.add("pressed");clearTimeout(swTimer);swTimer=setTimeout(function(){zone.classList.remove("pressed")},100);
+    render();
+  });
+
+  var last=Date.now(),saveAt=0;
+  setInterval(function(){
+    var now=Date.now(),dt=(now-last)/1000;last=now;
+    var s=perSec();
+    if(s>0){S.flushes+=s*dt;S.total+=s*dt;render()}
+    if(now-saveAt>5000){saveAt=now;save()}
+  },100);
+  window.addEventListener("pagehide",save);
+
+  var rb=$("reset"),armed=false,rt;
+  rb.addEventListener("click",function(){
+    if(!armed){armed=true;rb.textContent="Tap again to erase everything";rt=setTimeout(function(){armed=false;rb.textContent="Reset game"},3000);return}
+    clearTimeout(rt);armed=false;rb.textContent="Reset game";
+    S={flushes:0,total:0,owned:{}};save();render();
+  });
+  render();
+})();
+</script>
+</body>
+</html>
